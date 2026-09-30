@@ -49,7 +49,14 @@ namespace tp1
 
 		public int nivel(T dato)
 		{
-			return 0;
+			if (this.getDatoRaiz().Equals(dato)) {
+				return 1;}
+			foreach(var hijo in this.getHijos()){
+				int nivelEnHijo = hijo.nivel(dato);
+				if (nivelEnHijo != -1){
+					return 1 + nivelEnHijo;
+				}
+			}
 		}
 
 	}
