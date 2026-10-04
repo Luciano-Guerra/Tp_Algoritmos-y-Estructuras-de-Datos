@@ -38,7 +38,29 @@ namespace tpfinal
 
         public void Agregar(ArbolGeneral<ItemCat> arbol, ItemCat dato, string rutaAlPadre)
 		{
-            //implementar
+            string[] pasos= string rutaAlPadre.Split('/');
+            ArbolGeneral<ItemCat> nodoActual = arbol;
+
+            foreach (string paso in pasos)
+            {
+                ArbolGeneral<ItemCat> hijoEncontrado= null;
+                
+                foreach (ArbolGeneral<ItemCat> hijo in nodoActual.getHijos()){
+                    if(hijo.getDatoRaiz().Nombre == pasos) {hijoEncontrado = hijo;}
+                }
+
+                if (hijoEncontrado != null){
+                    nodoActual = hijoEncontrado;
+                }else
+                {
+                    ItemCat categoria = new ItemCat (paso, TipoElemento.Categoria);
+                    ArbolGeneral<ItemCat> arbolN= new ArbolGeneral<ItemCat>(categoria);
+                    nodoActual.agregarHijo(arbolN);
+                    nodoActual = arbolN;
+                }
+            }
+            ArbolGeneral<ItemCat> hijoNuevo = new ArbolGeneral<ItemCat> (dato);
+            nodoActual.agregarHijo(hijoNuevo);
         }
 
         public List<ItemCat> Buscar(ArbolGeneral<ItemCat> arbol, string elementoABuscar)
