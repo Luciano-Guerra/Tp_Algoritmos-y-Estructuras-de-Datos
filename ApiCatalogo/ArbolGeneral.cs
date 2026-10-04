@@ -43,7 +43,21 @@ namespace tp1
 
 		public int altura()
 		{
-			return 0;
+			if (this.esHoja()){
+				return 1;
+			}
+			
+			int maxAlturaHijos = 0;
+			
+			foreach (var hijo in this.getHijos()){
+				int alturaHijo = hijo.altura();
+				
+				if(alturaHijo > maxAlturaHijos){
+					maxAlturaHijos = alturaHijo;
+				}
+			}
+			
+			return 1+ maxAlturaHijos;
 		}
 
 
