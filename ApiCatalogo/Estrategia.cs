@@ -38,7 +38,7 @@ namespace tpfinal
 
         public void Agregar(ArbolGeneral<ItemCat> arbol, ItemCat dato, string rutaAlPadre)
 		{
-            string[] pasos= string rutaAlPadre.Split('/');
+            string[] pasos= rutaAlPadre.Split('/');
             ArbolGeneral<ItemCat> nodoActual = arbol;
 
             foreach (string paso in pasos)
@@ -65,7 +65,23 @@ namespace tpfinal
 
         public List<ItemCat> Buscar(ArbolGeneral<ItemCat> arbol, string elementoABuscar)
 		{
-			return [];
+			List<ItemCat> resultado = new List<ItemCat>();
+			Queue<ArbolGeneral<ItemCat>> buscado = new Queue<ArbolGeneral<ItemCat>>();
+			buscado.Enqueue(arbol);
+
+			while(buscado.Count > 0)
+			{
+				ArbolGeneral<ItemCat> actual = buscado.Dequeue();
+				if(actual.getDatoRaiz().Nombre.Contains(elementoABuscar))
+				{
+					resultado.Add(actual.getDatoRaiz());
+				}
+				foreach(ArbolGeneral<ItemCat> hijo in actual.getHijos())
+				{
+					buscado.Enqueue(hijo);
+				}
+			}
+			return resultado;
 		}
             
     }
