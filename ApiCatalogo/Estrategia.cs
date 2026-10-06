@@ -30,35 +30,39 @@ namespace tpfinal
             return [["Implementar"]];
         }
 
-
-        public List<ItemCat> Todos(ArbolGeneral<ItemCat> arbol)
-        {
-            return  [];
-        }
-
         public void Agregar(ArbolGeneral<ItemCat> arbol, ItemCat dato, string rutaAlPadre)
 		{
-            string[] pasos= rutaAlPadre.Split('/');
+			
+			if(arbol  == null || dato == null)
+			{
+				return;
+			}
+			
             ArbolGeneral<ItemCat> nodoActual = arbol;
 
-            foreach (string paso in pasos)
-            {
-                ArbolGeneral<ItemCat> hijoEncontrado= null;
+			if(!string.IsNullOrWhiteSpace(rutaAlPadre))
+			{
+				string[] pasos= rutaAlPadre.Split('/');
+            	foreach (string paso in pasos)
+            	{
+                	ArbolGeneral<ItemCat> hijoEncontrado= null;
                 
-                foreach (ArbolGeneral<ItemCat> hijo in nodoActual.getHijos()){
-                    if(hijo.getDatoRaiz().Nombre == pasos) {hijoEncontrado = hijo;}
-                }
+                	foreach (ArbolGeneral<ItemCat> hijo in nodoActual.getHijos())
+					{
+                    	if(hijo.getDatoRaiz().Nombre == paso) {hijoEncontrado = hijo;}
+                	}
 
-                if (hijoEncontrado != null){
-                    nodoActual = hijoEncontrado;
-                }else
-                {
-                    ItemCat categoria = new ItemCat (paso, TipoElemento.Categoria);
-                    ArbolGeneral<ItemCat> arbolN= new ArbolGeneral<ItemCat>(categoria);
-                    nodoActual.agregarHijo(arbolN);
-                    nodoActual = arbolN;
-                }
-            }
+                	if (hijoEncontrado != null){
+                    	nodoActual = hijoEncontrado;
+                	}else
+                	{
+                    	ItemCat categoria = new ItemCat (paso, TipoElemento.Categoria);
+                    	ArbolGeneral<ItemCat> arbolN= new ArbolGeneral<ItemCat>(categoria);
+                    	nodoActual.agregarHijo(arbolN);
+                    	nodoActual = arbolN;
+                	}
+            	}
+			}
             ArbolGeneral<ItemCat> hijoNuevo = new ArbolGeneral<ItemCat> (dato);
             nodoActual.agregarHijo(hijoNuevo);
         }
@@ -67,6 +71,12 @@ namespace tpfinal
 		{
 			List<ItemCat> resultado = new List<ItemCat>();
 			Queue<ArbolGeneral<ItemCat>> buscado = new Queue<ArbolGeneral<ItemCat>>();
+
+			if(arbol  == null)
+			{
+				return resultado;
+			}
+			
 			buscado.Enqueue(arbol);
 
 			while(buscado.Count > 0)
@@ -84,17 +94,24 @@ namespace tpfinal
 			return resultado;
 		}
 
-		public todos(ArbolGeneral<ItemCat> arbol)
+		public List<ItemCat> Todos(ArbolGeneral<ItemCat> arbol)
 		{
 			List<ItemCat> resultado = new List<ItemCat>();
 			Queue<ArbolGeneral<ItemCat>> pendientes = new Queue<ArbolGeneral<ItemCat>>();
+			
+			if(arbol  == null)
+			{
+				return resultado;
+			}
+			
 			pendientes.Enqueue(arbol);
 
 			while (pendientes.Count > 0)
 			{
 				ArbolGeneral<ItemCat> actual = pendientes.Dequeue();
-				if()
+				if(actual.getDatoRaiz().Tipo == TipoElemento.Producto)
 				{
+					resultado.Add(actual.getDatoRaiz());
 				}
 
 				foreach(ArbolGeneral<ItemCat> hijo in actual.getHijos())
@@ -103,6 +120,7 @@ namespace tpfinal
 				}
 
 			}
+			return resultado;
 		}
             
     }
