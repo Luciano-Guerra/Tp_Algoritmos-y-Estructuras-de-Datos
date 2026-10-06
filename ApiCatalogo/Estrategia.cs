@@ -42,7 +42,7 @@ namespace tpfinal
 
 			if(!string.IsNullOrWhiteSpace(rutaAlPadre))
 			{
-				string[] pasos= rutaAlPadre.Split('/');
+				string[] pasos= rutaAlPadre.Split('/', StringSplitOptions.RemoveEmptyEntries);
             	foreach (string paso in pasos)
             	{
                 	ArbolGeneral<ItemCat> hijoEncontrado= null;
@@ -82,7 +82,7 @@ namespace tpfinal
 			while(buscado.Count > 0)
 			{
 				ArbolGeneral<ItemCat> actual = buscado.Dequeue();
-				if(actual.getDatoRaiz().Nombre.Contains(elementoABuscar))
+				if(actual.getDatoRaiz().Nombre.Contains(elementoABuscar, StringComparison.OrdinalIgnoreCase))
 				{
 					resultado.Add(actual.getDatoRaiz());
 				}
