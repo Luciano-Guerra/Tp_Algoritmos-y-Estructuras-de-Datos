@@ -83,6 +83,27 @@ namespace tpfinal
 			}
 			return resultado;
 		}
+
+		public todos(ArbolGeneral<ItemCat> arbol)
+		{
+			List<ItemCat> resultado = new List<ItemCat>();
+			Queue<ArbolGeneral<ItemCat>> pendientes = new Queue<ArbolGeneral<ItemCat>>();
+			pendientes.Enqueue(arbol);
+
+			while (pendientes.Count > 0)
+			{
+				ArbolGeneral<ItemCat> actual = pendientes.Dequeue();
+				if()
+				{
+				}
+
+				foreach(ArbolGeneral<ItemCat> hijo in actual.getHijos())
+				{
+					pendientes.Enqueue(hijo);
+				}
+
+			}
+		}
             
     }
 }
