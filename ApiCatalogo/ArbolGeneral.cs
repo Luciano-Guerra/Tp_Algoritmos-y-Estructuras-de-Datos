@@ -67,7 +67,7 @@ namespace tp1
 		{
 			// CASO BASE DE ÉXITO: Si el dato de la raíz actual es igual al buscado, estamos en el inicio
 			if (this.getDatoRaiz().Equals(dato)) {
-				return 1; // Devuelve 1 (Tu cátedra cuenta la raíz como nivel 1)
+				return 1; // Devuelve 1 (La raiz es contada como 1 en este caso)
 			}
 			
 			// RECORREDOR RECURSIVO: Si no era la raíz, busca profundamente en cada uno de sus hijos
