@@ -20,12 +20,34 @@ namespace tpfinal // Pertenece al espacio de nombres del proyecto del catálogo
             return ["Implementar"]; // Retorno provisorio usando sintaxis de colección moderna
         }
 
+        //  --- MÉTODO 4: CONSULTA POR NIVELES (RESUELTO - RECORRIDO BFS CON FILTRO DE NOMBRES) ---
         public List<List<string>> ConsultaNiveles(ArbolGeneral<ItemCat> arbol)
         {
-            return [["Implementar"]]; // Retorno provisorio de lista de listas
+            List<<List<string>> listaFinal = new List<List<string>>();
+            if(arbol == null){
+                return listaFinal;
+            }
+            List<ArbolGeneral<ItemCat>> nodosNivel = new List<ArbolGeneral<ItemCat>>();
+            Queue<ArbolGeneral<ItemCat>> cola = new Queue<ArbolGeneral<ItemCat>>();
+            cola.Enqueue(arbol);
+            while(cola.Count > 0){
+                int nodosEnEsteNivel = cola.Count;
+                List<string> nombresNivel = new List<string>;
+                for (int i = 0; i < nodosEnEsteNivel; i++){
+                    ArbolGeneral<ItemCat> nodoActual = cola.Dequeue();
+                    nombresNivel.Add(nodoActual.getDatoRaiz().Nombre);
+                    if(nodoActual.getHijos() != null){
+                        foreach(ArbolGeneral<ItemCat> hijo in nodoActual.getHijos()){
+                            cola.Enqueue(hijo);
+                        }
+                    }
+                }
+                listaFinal.Add(nombresNivel);
+            }
+            return listaFinal;
         }
 
-        // --- MÉTODO 1: AGREGAR (RESUELTO - INSERCIÓN DINÁMICA DE RUTAS) ---
+        // --- MÉTODO 1: AGREGAR (RESUELTO - INSERCIÓN DINÁMICA DE RUTAS E IDENTIFICACION DE DUPLICADOS) ---
         public void Agregar(ArbolGeneral<ItemCat> arbol, ItemCat dato, string rutaAlPadre)
         {
             // ESCUDO PROTECTOR: Si no hay árbol o el producto a insertar es nulo, frena de inmediato
@@ -33,95 +55,65 @@ namespace tpfinal // Pertenece al espacio de nombres del proyecto del catálogo
             {
                 return; // Corta el método (void) para proteger la memoria de datos basura
             }
-            
+            // Validamos que la ruta de texto no sea nula, ni esté vacía o llena de espacios
+            if(string.IsNullOrWhiteSpace(rutaAlPadre)){
+                throw new ArgumentoException("Un producto debe tener una ruta de categorias validas");
+            }
             // Declaramos el puntero del viaje arrancando parados desde la raíz del árbol
             ArbolGeneral<ItemCat> nodoActual = arbol;
-
-            // Validamos que la ruta de texto no sea nula, ni esté vacía o llena de espacios
-            if(!string.IsNullOrWhiteSpace(rutaAlPadre))
-            {
-                // Rompe el texto por las barras y elimina entradas vacías accidentales (ej: "Moda//Running")
-                string[] pasos = rutaAlPadre.Split('/', StringSplitOptions.RemoveEmptyEntries);
-                
-                // BUCLE PRINCIPAL: Procesa palabra por palabra la ruta (ej: primero "Moda", luego "Ropa")
-                foreach (string paso in pasos)
-                {
-                    ArbolGeneral<ItemCat> hijoEncontrado = null; // Asumimos que la carpeta no existe en este nivel
-                
-                    // BUCLE INTERNO: Revisa uno por uno los hijos directos del nodo donde estamos parados
-                    foreach (ArbolGeneral<ItemCat> hijo in nodoActual.getHijos())
-                    {
-                        // Si el nombre del hijo coincide exactamente con el escalón de la ruta que buscamos...
-                        if(hijo.getDatoRaiz().Nombre == paso) 
-                        {
-                            hijoEncontrado = hijo; // ¡Lo encontramos! Guardamos su referencia
-                        }
-                    }
-
-                    // TOMAMOS UNA DECISIÓN BASADA EN LA BÚSQUEDA:
-                    if (hijoEncontrado != null)
-                    {
-                        // Opción A: Si ya existía, avanzamos nuestro viaje y nos paramos sobre ese hijo
-                        nodoActual = hijoEncontrado;
-                    }
-                    else
-                    {
-                        // Opción B: Si NO existía, creamos la categoría intermedia obligatoriamente
-                        ItemCat categoria = new ItemCat(paso, TipoElemento.Categoria); // Crea el dato
-                        ArbolGeneral<ItemCat> arbolN = new ArbolGeneral<ItemCat>(categoria); // Lo envuelve en un nodo
-                        
-                        nodoActual.agregarHijo(arbolN); // Cuelga la nueva categoría del padre actual
-                        nodoActual = arbolN; // Movemos nuestra posición adentro de la categoría que acabamos de crear
+            string[] pasos = rutaAlPadre.Split('/', StringSplitOption.RemoveEmptyEntries);
+            foreach(string paso in pasos){
+                ArbolGeneral<ItemCat> hijoEncontrado = null;
+                foreach (ArbolGeneral<ItemCat> hijo in nodoActual.getHijos()){
+                    if(hijo.getDatoRaiz().Nombre.Equals(paso, StringComparison.OrdinalIgnoreCase)){
+                        hijoEncontrado = hijo;
+                        break;
                     }
                 }
+                if(hijoEncontrado != null){
+                    nodoActual = hijoEncontrado;
+                }
+                else{
+                ItemCat categoria = new ItemCat(paso, TipoElemento.Categoria);
+                ArbolGeneral<ItemCat> arbolN = new ArbolGeneral<ItemCat> (categoria);
+                nodoActual.agregarHijo(arbolN);
+                nodoActual = arbolN;                    
+                }
             }
-            
-            // CIERRE DE AGREGAR: Ya sea que la ruta estaba vacía o viajamos 10 niveles, 
-            // envolvemos el producto real final en un nodo y lo colgamos en la ubicación exacta
+            //evitar que se dupliquen los productos
+            bool productoDuplicado = false;
+            foreach(ArbolGeneral<ItemCat> hijo in nodoActual.GetHijos()){
+                if(hijo.getDatoRaiz().esHoja && hijo.getDatoRaiz().Nombre.Equals(dato.Nombre, StringComparison.OrdinalIgnoreCase)){
+                    productoDuplicado = true;
+                    break;
+                }
+            }
+            if(productoDuplicado == true){
+                throw new InvalidOperationException($"El producto '{dato.Nombre}' ya existe en esta categoria");
+            }
             ArbolGeneral<ItemCat> hijoNuevo = new ArbolGeneral<ItemCat>(dato);
             nodoActual.agregarHijo(hijoNuevo);
         }
 
-        // --- MÉTODO 2: BUSCAR (RESUELTO - RECORRIDO BFS HORIZONTAL) ---
+        // --- MÉTODO 2: BUSCAR (RESUELTO - RECORRIDO DFS VERTICAL) ---
         public List<ItemCat> Buscar(ArbolGeneral<ItemCat> arbol, string elementoABuscar)
         {
-            // Instancia la lista plana donde acumularemos las coincidencias de texto
-            List<ItemCat> resultado = new List<ItemCat>();
-            
-            // Instancia la clase Cola para administrar el orden horizontal (Piso por piso)
-            Cola<ArbolGeneral<ItemCat>> buscado = new Cola<ArbolGeneral<ItemCat>>();
-
-            // ESCUDO DE SEGURIDAD: Si el árbol es nulo o no pasaron un texto para buscar, devolvemos la lista vacía
-            if(arbol == null || string.IsNullOrWhiteSpace(elementoABuscar))
-            {
-                return resultado;
+            List<ItemCat> resultadoAcumulado = new List<ItemCat>();
+            if(arbol == null || string.IsNullOrWhiteSpace(elementoABuscar)) return resultadoAcumulado;
+            BuscarAuxiliar(arbol, elementoABuscar, resultadoAcumulado);
+            return resultadoAcumulado;
+        }
+        private void BuscarAuxiliar(ArbolGeneral<ItemCat> nodo, string elementoABuscar, List<ItemCat> listaCompartida){
+            if(nodo == null) return;
+            if(nodo.getDatoRaiz().Nombre.Contains(elementoABuscar, StringComparison.OrdinalIgnoreCase)){
+                listaCompartida.Add(nodo.getDatoRaiz());
             }
-            
-            // Encolamos el nodo raíz para encender el motor del bucle
-            buscado.encolar(arbol);
-
-            // Mientras la cola tenga elementos pendientes por visitar...
-            while(!buscado.esVacia())
-            {
-                // Desencolamos el nodo al que le toca el turno y lo guardamos en 'actual'
-                ArbolGeneral<ItemCat> actual = buscado.desencolar();
-                
-                // CONDICIONAL FILTRO: Compara si el nombre del ítem contiene el texto buscado (ignorando mayúsculas/minúsculas)
-                if(actual.getDatoRaiz().Nombre.Contains(elementoABuscar, StringComparison.OrdinalIgnoreCase))
-                {
-                    // Si coincide total o parcialmente, guarda el ItemCat adentro de nuestra bolsa de resultados
-                    resultado.Add(actual.getDatoRaiz());
-                }
-                
-                // RECORRER HIJOS: Explora los descendientes directos del nodo procesado
-                foreach(ArbolGeneral<ItemCat> hijo in actual.getHijos())
-                {
-                    // Los manda al final de la fila de espera para revisarlos cuando toque su nivel
-                    buscado.encolar(hijo);
+            foreach(ArbolGeneral<ItemCat> hijo in nodo.getHijos()){
+                if(hijo != null){
+                    BuscarAuxiliar(hijo, elementoABuscar, listaCompartida);
                 }
             }
-            // Retorna la lista con todas las coincidencias recolectadas
-            return resultado;
+                
         }
 
         // --- MÉTODO 3: TODOS (RESUELTO - RECORRIDO BFS CON FILTRO DE PRODUCTOS) ---
