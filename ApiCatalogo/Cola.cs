@@ -56,5 +56,3 @@ namespace tp1
         }
     }
 }
-
-}
