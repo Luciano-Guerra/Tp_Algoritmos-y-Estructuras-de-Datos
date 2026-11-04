@@ -47,7 +47,27 @@ namespace tpfinal // Pertenece al espacio de nombres del proyecto del catálogo
         
         public List<string> GetURLsSEO(ArbolGeneral<ItemCat> arbol)
         {
-            return ["Implementar"]; // Retorno provisorio usando sintaxis de colección moderna
+            List<string> urls = new List<string>();
+            if(arbol == null) return null;
+            GetURLsSEOAuxiliar(arbol, "", urls);
+            return urls;
+
+        }
+
+        private void GetURLsSEOAuxiliar(ArbolGeneral<ItemCat> nodo, string urlAcumulado, List<string> urls)
+        {
+            if(nodo == null) return;
+            string nuevaUrl = urlAcumulado + "/" + nodo.getDatoRaiz().Nombre.ToLower().Replace(" ", "-");
+            if (nodo.esHoja())
+            {
+                urls.Add(nuevaUrl);
+            }
+            if(nodo.getHijos() != null){
+                foreach(ArbolGeneral<ItemCat> hijo in nodo.getHijos())
+                {
+                    GetURLsSEOAuxiliar(hijo, nuevaUrl, urls);
+                }
+            }
         }
 
         //  --- MÉTODO 4: CONSULTA POR NIVELES (RESUELTO - RECORRIDO BFS CON FILTRO DE NOMBRES) ---
