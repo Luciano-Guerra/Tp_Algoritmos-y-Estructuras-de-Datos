@@ -57,7 +57,7 @@ namespace tpfinal{
             }
         }
         public List<List<string>> ConsultaNiveles(ArbolGeneral<ItemCat> arbol){
-            List<<List<string>> listaFinal = new List<List<string>>();
+            List<List<string>> listaFinal = new List<List<string>>();
             if(arbol == null){
                 return listaFinal;
             }
@@ -66,7 +66,7 @@ namespace tpfinal{
             cola.Enqueue(arbol);
             while(cola.Count > 0){
                 int nodosEnEsteNivel = cola.Count;
-                List<string> nombresNivel = new List<string>; 
+                List<string> nombresNivel = new List<string>(); 
                 for (int i = 0; i < nodosEnEsteNivel; i++){
                     ArbolGeneral<ItemCat> nodoActual = cola.Dequeue();
                     nombresNivel.Add(nodoActual.getDatoRaiz().Nombre);
@@ -85,10 +85,10 @@ namespace tpfinal{
                 return; 
             }
             if(string.IsNullOrWhiteSpace(rutaAlPadre)){
-                throw new ArgumentoException("Un producto debe tener una ruta de categorias validas");
+                throw new ArgumentException("Un producto debe tener una ruta de categorias validas");
             }
             ArbolGeneral<ItemCat> nodoActual = arbol;
-            string[] pasos = rutaAlPadre.Split('/', StringSplitOption.RemoveEmptyEntries);
+            string[] pasos = rutaAlPadre.Split('/', StringSplitOptions.RemoveEmptyEntries);
             foreach(string paso in pasos){
                 ArbolGeneral<ItemCat> hijoEncontrado = null; 
                 foreach (ArbolGeneral<ItemCat> hijo in nodoActual.getHijos()){
@@ -108,7 +108,7 @@ namespace tpfinal{
                 }
             }
             bool productoDuplicado = false;
-            foreach(ArbolGeneral<ItemCat> hijo in nodoActual.GetHijos()){
+            foreach(ArbolGeneral<ItemCat> hijo in nodoActual.getHijos()){
                 if(hijo.esHoja() && hijo.getDatoRaiz().Nombre.Equals(dato.Nombre, StringComparison.OrdinalIgnoreCase)){
                     productoDuplicado = true; 
                     break;
